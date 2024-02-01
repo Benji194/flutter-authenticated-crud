@@ -7,7 +7,7 @@ class AuthDataSourceImpl extends AuthDataSource {
 
   final dio = Dio(
     BaseOptions(
-      baseUrl: Enviroment.apiUrl,
+      baseUrl: Environment.apiUrl,
     )
   );
 
@@ -30,8 +30,18 @@ class AuthDataSourceImpl extends AuthDataSource {
       return user;
 
     } 
-    catch (e) {
-      throw WrongCredentials();
+     on DioException  catch (e) {
+      if (e.response?.statusCode == 401){
+        throw CustomError(message:  e.response?.data['message'] ?? 'Credenciales incorrectas');
+
+      } 
+      if (e.type == DioExceptionType.connectionTimeout ){
+        throw CustomError(message: 'Revisar conexion a internet');
+      } 
+      throw Exception();
+    }
+    catch(e){
+      throw  Exception();
     }
   }
 
